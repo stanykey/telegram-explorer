@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+build = "*"
+twine = "*"
+pyrogram = "*"
+tgcrypto = "*"
+
+[dev-packages]
+pre-commit = "*"
+telegram-grabber = {editable = true, path = "."}
+
+[requires]
+python_version = "3.11"
