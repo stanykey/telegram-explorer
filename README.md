@@ -1,3 +1,3 @@
-# Telegram Grabber
+# Telegram Explorer
 
-Tools to interact with Telegram
+Tools to explore with Telegram

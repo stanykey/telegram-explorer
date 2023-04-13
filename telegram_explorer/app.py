@@ -12,7 +12,7 @@ class Application(Tk):
         super().__init__()
 
         self.protocol("WM_DELETE_WINDOW", self.close)
-        self.title("Telegram Chat/Channel History Downloader")
+        self.title("Telegram Explorer")
 
         self._setup_layout()
 
@@ -67,7 +67,6 @@ class Application(Tk):
         while self._running:
             self.update()
             await sleep(interval)
-        print("done")
 
     async def _shutdown(self) -> None:
         self._loop.stop()

@@ -11,7 +11,7 @@ tgcrypto = "*"
 
 [dev-packages]
 pre-commit = "*"
-telegram-grabber = {editable = true, path = "."}
+telegram-explorer = {editable = true, path = "."}
 
 [requires]
 python_version = "3.11"

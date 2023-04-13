@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "7b40deba4e65e5ec078b6f097e667370528503916520dd699f542d5e7a17b291"
+            "sha256": "ef3a199db0ad86f43cd31d26cb41f68105e61ffed76a8f811c739e07dcbcb71d"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -531,7 +531,7 @@
             "markers": "python_version >= '3.7'",
             "version": "==67.6.1"
         },
-        "telegram-grabber": {
+        "telegram-explorer": {
             "editable": true,
             "path": "."
         },
