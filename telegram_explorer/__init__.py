@@ -23,8 +23,16 @@ class Settings:
     path: Path = settings_file()
 
     def __post_init__(self) -> None:
+        """We just want to do some minimal validation."""
         if not self._validate_api():
             raise ValueError("Settings initialized with wrong values")
+
+    def get_session_dir(self) -> Path:
+        """Return the settings parent directory, and ensure it exists."""
+        working_dir = self.path.parent
+        if not working_dir.exists():
+            working_dir.mkdir(parents=True, exist_ok=True)
+        return working_dir
 
     @classmethod
     def load(cls, path: Path) -> Self:
