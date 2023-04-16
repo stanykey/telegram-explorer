@@ -80,6 +80,12 @@ async def get_telegram_history(config: Settings, chat_name: str, date_from: date
 @option("-s", "--date-from", type=Date(), default=date.min, help="Start date  [default: epoch]")
 @option("-e", "--date-to", type=Date(), default=date.today(), help="End date    [default: today]")
 def cli(api: tuple[int, str], chat: str, date_from: date, date_to: date) -> None:
+    """
+    The application obtains and prints the history of a particular `chat`.
+
+    If the **API** arguments are omitted then the application tries to read them from settings from the default location
+    (~/.telegram- explorer/settings.json)
+    """
     config = get_settings(api)
     task = get_telegram_history(config, chat, date_from, date_to)
     execute_synchronously(task)
