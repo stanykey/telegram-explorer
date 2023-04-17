@@ -68,3 +68,5 @@ repos:
           - --ignore-missing-imports
           - --strict
           - --allow-untyped-decorators
+        additional_dependencies:
+          - types-ttkthemes
