@@ -36,6 +36,7 @@ class Settings:
 
     @classmethod
     def load(cls, path: Path) -> Self:
+        """Load settings from the `path`."""
         if not path.is_file():
             raise ValueError(f"path ({path}) is not a file.")
 
@@ -43,6 +44,11 @@ class Settings:
             raw_settings: dict[str, Any] = load(file)
 
         return cls(path=path, api_id=int(raw_settings.get("api_id", 0)), api_hash=raw_settings.get("api_hash", ""))
+
+    @classmethod
+    def load_default(cls) -> Self:
+        """Load settings from the default settings location."""
+        return cls.load(settings_file())
 
     def save(self) -> None:
         path = self.path if not self.path.exists() else self.path.with_suffix(".new")
