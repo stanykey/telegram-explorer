@@ -20,6 +20,7 @@ def settings_file() -> Path:
 class Settings:
     api_id: int
     api_hash: str
+    phone_number: str = ""
     path: Path = settings_file()
 
     def __post_init__(self) -> None:
@@ -43,7 +44,12 @@ class Settings:
         with open(path, encoding="utf-8") as file:
             raw_settings: dict[str, Any] = load(file)
 
-        return cls(path=path, api_id=int(raw_settings.get("api_id", 0)), api_hash=raw_settings.get("api_hash", ""))
+        return cls(
+            path=path,
+            api_id=int(raw_settings.get("api_id", 0)),
+            api_hash=raw_settings.get("api_hash", ""),
+            phone_number=raw_settings.get("phone_number", ""),
+        )
 
     @classmethod
     def load_default(cls) -> Self:
@@ -54,6 +60,9 @@ class Settings:
         path = self.path if not self.path.exists() else self.path.with_suffix(".new")
 
         data = dict(api_id=self.api_id, api_hash=self.api_hash)
+        if self.phone_number:
+            data["phone_number"] = self.phone_number
+
         with open(path, "w", encoding="utf-8") as file:
             dump(data, file, indent=4)
 

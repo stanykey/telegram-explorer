@@ -30,6 +30,7 @@ def make_telegram_client(config: Settings, /) -> Client:
         api_id=config.api_id,
         api_hash=config.api_hash,
         workdir=str(config.get_session_dir()),
+        phone_number=config.phone_number,
         hide_password=True,
     )
 
