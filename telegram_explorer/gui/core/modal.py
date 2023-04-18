@@ -1,5 +1,12 @@
+from enum import auto
+from enum import IntEnum
 from tkinter import Tk
 from tkinter import Toplevel
+
+
+class FormResult(IntEnum):
+    Ok = auto()
+    Cancel = auto()
 
 
 class ModalForm(Toplevel):
@@ -7,13 +14,24 @@ class ModalForm(Toplevel):
         super().__init__(parent, bg=parent.cget("bg"))
         self.resizable(False, False)
 
+        self._modal_result = FormResult.Ok
+
         self.wait_visibility()
         self.grab_set()
         self.transient(parent)
 
-    def show_modal(self) -> None:
+    def show_modal(self) -> FormResult:
         self._center()
         self.master.wait_window(self)
+        return self._modal_result
+
+    def ok(self) -> None:
+        self._modal_result = FormResult.Ok
+        self.close()
+
+    def cancel(self) -> None:
+        self._modal_result = FormResult.Cancel
+        self.close()
 
     def close(self) -> None:
         self.grab_release()

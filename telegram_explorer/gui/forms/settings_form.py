@@ -31,10 +31,10 @@ class SettingsForm(ModalForm):
         Entry(self, textvariable=self._api_hash).grid(row=1, column=1, columnspan=2, sticky="EW", padx=5, pady=5)
 
         Button(self, text="Save", command=self._save).grid(row=2, column=1, sticky="EW", padx=5, pady=5)
-        Button(self, text="Cancel", command=self.close).grid(row=2, column=2, sticky="EW", padx=5, pady=5)
+        Button(self, text="Cancel", command=self.cancel).grid(row=2, column=2, sticky="EW", padx=5, pady=5)
 
     def _save(self) -> None:
         self._settings.api_id = self._api_id.get()
         self._settings.api_hash = self._api_hash.get()
         self._settings.save()
-        self.close()
+        self.ok()
