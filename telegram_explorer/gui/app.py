@@ -1,7 +1,7 @@
 from asyncio import AbstractEventLoop
 from asyncio import get_event_loop
 from asyncio import sleep
-from tkinter import messagebox
+from datetime import date
 from tkinter.ttk import Button
 from tkinter.ttk import Combobox
 from tkinter.ttk import Label
@@ -11,7 +11,12 @@ from tkcalendar import DateEntry
 from ttkthemes import ThemedTk
 
 from telegram_explorer import Settings
+from telegram_explorer.gui.forms import FormResult
+from telegram_explorer.gui.forms import LoginForm
 from telegram_explorer.gui.forms import SettingsForm
+from telegram_explorer.telegram import Chat
+from telegram_explorer.telegram import Message
+from telegram_explorer.telegram import TelegramClient
 
 
 class Application(ThemedTk):
@@ -28,6 +33,8 @@ class Application(ThemedTk):
         self._loop = loop
         self._running = True
         self._gui = loop.create_task(self._run_gui(interval), name="gui-loop")
+
+        self._loop.create_task(self._get_chats_list())
 
     def close(self) -> None:
         self._running = False
@@ -63,7 +70,7 @@ class Application(ThemedTk):
         settings_button.grid(row=2, column=0, sticky="ewns", padx=5, pady=5)
 
         # Download Button
-        download_button = Button(self, text="Download History", command=self._download_history)
+        download_button = Button(self, text="Download History", command=self._request_download_history)
         download_button.grid(row=2, column=3, columnspan=1, sticky="ewns", padx=5, pady=5)
 
         # Messages
@@ -83,9 +90,59 @@ class Application(ThemedTk):
         form = SettingsForm(self, self._settings)
         form.show_modal()
 
-    @staticmethod
-    def _download_history() -> None:
-        messagebox.showinfo(message="Download History Placeholder")
+    def _request_download_history(self) -> None:
+        self._loop.create_task(self._download_history())
+
+    def _get_telegram_client(self) -> TelegramClient:
+        return TelegramClient(
+            name="telegram-explorer",
+            api_id=self._settings.api_id,
+            api_hash=self._settings.api_hash,
+            phone_number=self._settings.phone_number,
+            session_dir=self._settings.get_session_dir(),
+        )
+
+    async def _get_chats_list(self) -> None:
+        if not await self._login():
+            return
+
+        client = self._get_telegram_client()
+        chats = await client.get_chats()
+        await self._fill_chats_box(chats)
+
+    async def _download_history(self) -> None:
+        if not await self._login():
+            return
+
+        chat = "me"  # TODO: get the Chat object by the `Chat` combobox value
+        date_from = date.min  # TODO: get date from `Start Date` date entry value
+        date_to = date.today()  # TODO: get date from `End Date` date entry value
+
+        client = self._get_telegram_client()
+        history = await client.download_history(chat, date_from, date_to)
+        await self._fill_messages_grid(history)
+
+    async def _check_session(self) -> bool:
+        """Check for authorization status."""
+        client = self._get_telegram_client()
+        return await client.is_authorized()
+
+    async def _login(self, *, force: bool = False) -> bool:
+        """Initiate logic procedure which can take a lot of time."""
+        if not force and await self._check_session():
+            return True
+
+        login_form = LoginForm(self, self._settings)
+        status = login_form.show_modal()
+        return status is not FormResult.Ok
+
+    async def _fill_chats_box(self, chats: list[Chat]) -> None:
+        # TODO: (re)fill chat combobox here
+        print(chats)
+
+    async def _fill_messages_grid(self, history: list[Message]) -> None:
+        # TODO: (re)fill messages grid here
+        print(history)
 
 
 def run() -> None:
