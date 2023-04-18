@@ -10,7 +10,7 @@ class FormResult(IntEnum):
 
 
 class ModalForm(Toplevel):
-    def __init__(self, parent: Tk) -> None:
+    def __init__(self, parent: Tk | Toplevel) -> None:
         super().__init__(parent, bg=parent.cget("bg"))
         self.resizable(False, False)
 
