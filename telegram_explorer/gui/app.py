@@ -4,6 +4,8 @@ from asyncio import sleep
 from datetime import date
 from tkinter import messagebox
 from tkinter import StringVar
+from tkinter import Tk
+from tkinter import Variable
 from tkinter.ttk import Button
 from tkinter.ttk import Combobox
 from tkinter.ttk import Label
@@ -22,6 +24,30 @@ from telegram_explorer.telegram import Message
 from telegram_explorer.telegram import TelegramClient
 
 
+class DateVar(Variable):
+    """Value holder for strings variables."""
+
+    _default = date.today()
+
+    def __init__(self, master: Tk | None = None, value: str | date | None = None, name: str | None = None) -> None:
+        super().__init__(master, value, name)
+
+    def set(self, value: str | date) -> None:
+        super().set(value)
+
+    def get(self) -> date:
+        """Return value of variable as date."""
+        value = super().get()  # type: ignore
+        if isinstance(value, date):
+            return value
+
+        try:
+            return date.fromisoformat(value)
+        except ValueError:
+            day, month, year = tuple(map(int, value.split(".")))
+            return date(year, month, day)
+
+
 class Application(ThemedTk):
     def __init__(self, loop: AbstractEventLoop, interval: float = 1 / 120) -> None:
         super().__init__(theme="clearlooks", themebg=True)
@@ -30,7 +56,10 @@ class Application(ThemedTk):
         self.title("Telegram Explorer")
         self.resizable(False, False)
 
-        self._chat_name = StringVar()
+        self._chat_name = StringVar(self, name="chat_name")
+        self._date_from = DateVar(self, name="date_from")
+        self._date_to = DateVar(self, name="date_to")
+
         self._chats: dict[str, Chat] = dict()
 
         self._settings = Settings.load_default()
@@ -67,10 +96,14 @@ class Application(ThemedTk):
 
         # Dates
         Label(self, text="Start Date:").grid(row=1, column=0, sticky="ewns", padx=5, pady=5)
-        DateEntry(self).grid(row=1, column=1, sticky="ewns", padx=5, pady=5)
+        self._date_entry_from = DateEntry(self, textvariable=self._date_from, date_pattern="dd.mm.yyyy")
+        self._date_entry_from.set_date(date.today())
+        self._date_entry_from.grid(row=1, column=1, sticky="ewns", padx=5, pady=5)
 
         Label(self, text="End Date:").grid(row=1, column=2, sticky="ens", padx=5, pady=5)
-        DateEntry(self).grid(row=1, column=3, sticky="ewns", padx=5, pady=5)
+        self._date_entry_to = DateEntry(self, textvariable=self._date_to, date_pattern="dd.mm.yyyy")
+        self._date_entry_to.set_date(date.today())
+        self._date_entry_to.grid(row=1, column=3, sticky="ewns", padx=5, pady=5)
 
         # Settings Button
         settings_button = Button(self, text="Settings", command=self._show_settings)
@@ -99,6 +132,16 @@ class Application(ThemedTk):
             messagebox.showerror(title="Error", message="Select chat first")
             return
 
+        start = self._date_from.get()
+        end = self._date_to.get()
+        if not (start and end):
+            messagebox.showerror(title="Error", message="Choose dates")
+            return
+
+        if start > end:
+            messagebox.showerror(title="Error", message="Start date must be less or equal to End date")
+            return
+
         self._loop.create_task(self._download_history())
 
     def _get_telegram_client(self) -> TelegramClient:
@@ -122,9 +165,9 @@ class Application(ThemedTk):
         if not await self._login():
             return
 
-        chat = self._chats[self._chat_name.get()]
-        date_from = date.min  # TODO: get date from `Start Date` date entry value
-        date_to = date.today()  # TODO: get date from `End Date` date entry value
+        chat = self._chats.get(self._chat_name.get())
+        date_from = self._date_from.get()
+        date_to = self._date_to.get()
 
         client = self._get_telegram_client()
         history = await client.download_history(chat, date_from, date_to)
@@ -161,10 +204,9 @@ class Application(ThemedTk):
         return str(chat.title) if chat.title else ""
 
     async def _fill_messages_grid(self, history: list[Message]) -> None:
-        print(history)
         self._clear_history()
         for msg in history:
-            visible_values = msg.date, msg.author_signature, msg.text
+            visible_values = msg.date.date(), msg.author_signature, msg.text
             self._messages.insert("", "end", values=visible_values)
 
     def _clear_history(self) -> None:
