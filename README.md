@@ -13,6 +13,7 @@ This is an educational project. It is based on my friend's nephew's lab task.
 - [ ] implement the gui-application
     - [x] learn how to build gui-apps with the [tkinter](https://docs.python.org/3/library/tkinter.html) library
     - [ ] enhance ui (need to try to prettify)
+    - [ ] handle FloodWait error and other async errors
 
 #### References
 - [pyrogram](https://docs.pyrogram.org): modern, elegant and asynchronous framework for Telegram API
