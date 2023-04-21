@@ -1,4 +1,4 @@
-"""Set of CLI helpers (mostly related to the click package)."""
+"""Contain custom parameters types compatible with the `click` package."""
 from datetime import date
 from datetime import datetime
 

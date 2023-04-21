@@ -1,4 +1,4 @@
-"""Set of helpers to work with asynio."""
+"""Set of helpers to work with asyncio."""
 from asyncio import run
 from collections.abc import Coroutine
 from typing import Any

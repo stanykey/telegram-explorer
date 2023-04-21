@@ -11,8 +11,8 @@ from pyrogram.types import Chat
 
 from telegram_explorer import Settings
 from telegram_explorer import settings_file
-from telegram_explorer.misc.asyncio import execute_synchronously
-from telegram_explorer.misc.cli import Date
+from telegram_explorer.cli.internal.asyncio import execute_synchronously
+from telegram_explorer.cli.internal.params import Date
 
 
 def get_settings(api: tuple[int, str]) -> Settings:
