@@ -1,3 +1,4 @@
+"""Components to work with Telegram API."""
 from pyrogram.enums import ChatType
 from pyrogram.types import Chat
 from pyrogram.types import Message

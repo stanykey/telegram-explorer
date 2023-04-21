@@ -1,3 +1,8 @@
+"""
+The package is a small toolset to explore Telegram-related stuff.
+
+Also, contain the definition of package settings and related stuff.
+"""
 from dataclasses import dataclass
 from json import dump
 from json import load

@@ -1,4 +1,4 @@
-"""Simple wrapper around Pyrogam.Client class."""
+"""Simple wrapper around Pyrogram.Client class."""
 from datetime import date
 from datetime import datetime
 from datetime import timezone

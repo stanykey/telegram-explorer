@@ -1,3 +1,8 @@
+"""
+Simple applications settings editor.
+
+It can be used in the standalone form to edit settings.
+"""
 from tkinter import IntVar
 from tkinter import StringVar
 from tkinter import Tk

@@ -1,3 +1,9 @@
+"""
+Encapsulate the login process into the Telegram account.
+
+It can be used in the standalone form to log in because it depends on the `telegram` module only, which stores the
+session data in the file.
+"""
 from tkinter import StringVar
 from tkinter import Tk
 from tkinter import Toplevel
@@ -11,6 +17,8 @@ from telegram_explorer.gui.core.modal import ModalForm
 
 
 class PhoneCodeForm(ModalForm):
+    """Simple one-field form to input a code for the two-step auth flow."""
+
     def __init__(self, parent: Toplevel) -> None:
         super().__init__(parent)
         self.title("PhoneCode")
@@ -32,6 +40,8 @@ class PhoneCodeForm(ModalForm):
 
 
 class LoginForm(ModalForm):
+    """Login window: contains complete knowledge about the login process."""
+
     def __init__(self, parent: Tk, settings: Settings) -> None:
         super().__init__(parent)
         self.title("LoginForm")
