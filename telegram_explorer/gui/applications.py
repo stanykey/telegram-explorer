@@ -8,7 +8,7 @@ from telegram_explorer.gui.main_window import MainWindow
 
 def run_settings_editor() -> None:
     """Run settings form as the standalone application."""
-    app = Runner("Explorer Settings", theme="clearlooks")
+    app = Runner("Telegram Explorer Settings", theme="clearlooks")
     settings_window = SettingsForm(app, app.settings)
     app.start(settings_window)
 
