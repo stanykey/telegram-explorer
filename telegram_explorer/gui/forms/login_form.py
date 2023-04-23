@@ -4,6 +4,7 @@ Encapsulate the login process into the Telegram account.
 It can be used in the standalone form to log in because it depends on the `telegram` module only, which stores the
 session data in the file.
 """
+from asyncio import AbstractEventLoop
 from tkinter import StringVar
 from tkinter import Tk
 from tkinter import Toplevel
@@ -42,17 +43,18 @@ class PhoneCodeForm(ModalForm):
 class LoginForm(ModalForm):
     """Login window: contains complete knowledge about the login process."""
 
-    def __init__(self, parent: Tk | Toplevel, settings: Settings) -> None:
-        super().__init__(parent, title="LoginForm")
+    def __init__(self, parent: Tk | Toplevel, settings: Settings, loop: AbstractEventLoop, *, title: str = "") -> None:
+        super().__init__(parent, title)
 
         self._settings = settings
+        self._loop = loop
 
         self._phone_number = StringVar(self, value=settings.phone_number, name="phone_number")
         self._password = StringVar(self, name="password")
 
-        self._setup_layout()
+        self._create_controls()
 
-    def _setup_layout(self) -> None:
+    def _create_controls(self) -> None:
         # Phone number
         Label(self, text="Phone number:").grid(row=0, column=0, sticky="ewns", padx=5, pady=5)
         Entry(self, textvariable=self._phone_number).grid(row=0, column=1, columnspan=2, sticky="ewns", padx=5, pady=5)

@@ -140,7 +140,7 @@ class MainWindow(Toplevel):
         if not force and await self._check_session():
             return True
 
-        login_form = LoginForm(self, self._settings)
+        login_form = LoginForm(self, self._settings, self._loop)
         status = login_form.show_modal()
         return status is not FormResult.Ok
 
