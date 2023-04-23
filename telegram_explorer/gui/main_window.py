@@ -1,20 +1,19 @@
 from asyncio import AbstractEventLoop
-from asyncio import get_event_loop
-from asyncio import sleep
 from datetime import date
 from tkinter import messagebox
 from tkinter import StringVar
 from tkinter import Tk
-from tkinter import Variable
+from tkinter import Toplevel
 from tkinter.ttk import Button
 from tkinter.ttk import Combobox
 from tkinter.ttk import Label
 from tkinter.ttk import Treeview
 
 from tkcalendar import DateEntry
-from ttkthemes import ThemedTk
 
 from telegram_explorer import Settings
+from telegram_explorer.gui.core.misc import centralize_window
+from telegram_explorer.gui.core.variable import DateVar
 from telegram_explorer.gui.forms import FormResult
 from telegram_explorer.gui.forms import LoginForm
 from telegram_explorer.gui.forms import SettingsForm
@@ -24,77 +23,36 @@ from telegram_explorer.telegram import Message
 from telegram_explorer.telegram import TelegramClient
 
 
-class DateVar(Variable):
-    """Value holder for strings variables."""
-
-    _default = date.today()
-
-    def __init__(self, master: Tk | None = None, value: str | date | None = None, name: str | None = None) -> None:
-        super().__init__(master, value, name)
-
-    def set(self, value: str | date) -> None:
-        super().set(value)
-
-    def get(self) -> date:
-        """Return value of variable as date."""
-        value = super().get()  # type: ignore
-        if isinstance(value, date):
-            return value
-
-        try:
-            return date.fromisoformat(value)
-        except ValueError:
-            day, month, year = tuple(map(int, value.split(".")))
-            return date(year, month, day)
-
-
-class Application(ThemedTk):
-    def __init__(self, loop: AbstractEventLoop, interval: float = 1 / 120) -> None:
-        super().__init__(theme="clearlooks", themebg=True)
-
-        self.protocol("WM_DELETE_WINDOW", self.close)
-        self.title("Telegram Explorer")
+class MainWindow(Toplevel):
+    def __init__(self, parent: Tk | Toplevel, settings: Settings, loop: AbstractEventLoop) -> None:
+        super().__init__(parent)
         self.resizable(False, False)
 
-        self._chat_name = StringVar(self, name="chat_name")
-        self._date_from = DateVar(self, name="date_from")
-        self._date_to = DateVar(self, name="date_to")
+        self._settings = settings
+        self._loop = loop
 
         self._chats: dict[str, Chat] = dict()
 
-        self._settings = Settings.load_default()
-        self._setup_layout()
+        self._chat_name = StringVar(self, name="chat-name")
+        self._date_from = DateVar(self, name="date-from")
+        self._date_to = DateVar(self, name="date-to")
 
-        self._loop = loop
-        self._running = True
-        self._gui = loop.create_task(self._run_gui(interval), name="gui-loop")
+        self.overrideredirect(True)
+        self.withdraw()
+        self._create_controls()
+        centralize_window(self, parent)
+        self.overrideredirect(False)
+        self.deiconify()
 
         self._loop.create_task(self._get_chats_list())
 
-    def close(self) -> None:
-        self._running = False
-        self._loop.create_task(self._shutdown(), name="shutdown")
-
-    def start(self) -> None:
-        """Run application main loop."""
-        self._loop.run_forever()
-
-    async def _run_gui(self, interval: float) -> None:
-        while self._running:
-            self.update()
-            await sleep(interval)
-
-    async def _shutdown(self) -> None:
-        self._loop.stop()
-        self.destroy()
-
-    def _setup_layout(self) -> None:
-        # Chat
+    def _create_controls(self) -> None:
+        # Chat selection
         Label(self, text="Chat:").grid(row=0, column=0, sticky="ewns", padx=5, pady=5)
         self._chatsbox = Combobox(self, state="readonly", textvariable=self._chat_name)
         self._chatsbox.grid(row=0, column=1, columnspan=3, sticky="ewns", padx=5, pady=5)
 
-        # Dates
+        # Dates selections
         Label(self, text="Start Date:").grid(row=1, column=0, sticky="ewns", padx=5, pady=5)
         self._date_entry_from = DateEntry(self, textvariable=self._date_from, date_pattern="dd.mm.yyyy")
         self._date_entry_from.set_date(date.today())
@@ -105,15 +63,14 @@ class Application(ThemedTk):
         self._date_entry_to.set_date(date.today())
         self._date_entry_to.grid(row=1, column=3, sticky="ewns", padx=5, pady=5)
 
-        # Settings Button
+        # Buttons
         settings_button = Button(self, text="Settings", command=self._show_settings)
         settings_button.grid(row=2, column=0, sticky="ewns", padx=5, pady=5)
 
-        # Download Button
         download_button = Button(self, text="Download History", command=self._request_download_history)
         download_button.grid(row=2, column=3, columnspan=1, sticky="ewns", padx=5, pady=5)
 
-        # Messages
+        # Messages grid view
         columns = ("date", "author", "text")
         self._messages = Treeview(self, columns=columns, show="headings")
         for col in columns:
@@ -124,7 +81,7 @@ class Application(ThemedTk):
         self._messages.grid(row=3, column=0, columnspan=4, sticky="ewns", padx=5, pady=5)
 
     def _show_settings(self) -> None:
-        form = SettingsForm(self, self._settings)
+        form = SettingsForm(self, self._settings, title="Settings")
         form.show_modal()
 
     def _request_download_history(self) -> None:
@@ -212,13 +169,3 @@ class Application(ThemedTk):
     def _clear_history(self) -> None:
         rows = self._messages.get_children()
         self._messages.delete(*rows)
-
-
-def run() -> None:
-    loop = get_event_loop()
-    app = Application(loop)
-    app.start()
-
-
-if __name__ == "__main__":
-    run()

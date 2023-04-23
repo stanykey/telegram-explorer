@@ -42,9 +42,8 @@ class PhoneCodeForm(ModalForm):
 class LoginForm(ModalForm):
     """Login window: contains complete knowledge about the login process."""
 
-    def __init__(self, parent: Tk, settings: Settings) -> None:
-        super().__init__(parent)
-        self.title("LoginForm")
+    def __init__(self, parent: Tk | Toplevel, settings: Settings) -> None:
+        super().__init__(parent, title="LoginForm")
 
         self._settings = settings
 
