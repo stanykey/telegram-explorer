@@ -7,8 +7,8 @@ from tkinter import Toplevel
 from ttkthemes.themed_tk import ThemedTk
 
 from telegram_explorer import Settings
-from telegram_explorer.gui.core.misc import centralize_window
 from telegram_explorer.gui.core.misc import get_event_loop
+from telegram_explorer.gui.core.window import centralize_window
 
 
 class Runner(ThemedTk):

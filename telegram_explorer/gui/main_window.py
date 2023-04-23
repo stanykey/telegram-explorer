@@ -12,8 +12,8 @@ from tkinter.ttk import Treeview
 from tkcalendar import DateEntry
 
 from telegram_explorer import Settings
-from telegram_explorer.gui.core.misc import centralize_window
 from telegram_explorer.gui.core.variable import DateVar
+from telegram_explorer.gui.core.window import centralize_window
 from telegram_explorer.gui.forms import FormResult
 from telegram_explorer.gui.forms import LoginForm
 from telegram_explorer.gui.forms import SettingsForm

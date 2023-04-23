@@ -4,7 +4,7 @@ from tkinter import Tk
 from tkinter import Toplevel
 from typing import cast
 
-from telegram_explorer.gui.core.misc import centralize_window
+from telegram_explorer.gui.core.window import centralize_window
 
 
 class FormResult(IntEnum):
