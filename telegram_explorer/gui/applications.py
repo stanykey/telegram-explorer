@@ -9,7 +9,7 @@ from telegram_explorer.gui.main_window import MainWindow
 
 def make_application_runner(title: str, *, asynchronous: bool = False) -> Runner:
     """Create application runner."""
-    if asynchronous:
+    if not asynchronous:
         return Runner(title, theme="clearlooks")
 
     return AsyncRunner(title, theme="clearlooks", loop=get_event_loop())
