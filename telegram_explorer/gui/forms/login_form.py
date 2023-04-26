@@ -51,6 +51,7 @@ class PhoneCodeForm(ModalForm):
 
 class LoginResult(IntEnum):
     Success = auto()
+    Cancelled = auto()
     PhoneNumberInvalid = auto()
     CodeWrong = auto()
     UserUnregistered = auto()
@@ -78,11 +79,7 @@ class LoginForm(ModalForm):
 
         # Password
         Label(self, text="Password:").grid(row=1, column=0, sticky="ewns", padx=5, pady=5)
-        password = Entry(
-            self,
-            textvariable=self._password,
-            show="*",
-        )
+        password = Entry(self, textvariable=self._password, show="*")
         password.grid(row=1, column=1, columnspan=2, sticky="ewns", padx=5, pady=5)
 
         # Buttons
@@ -107,9 +104,10 @@ class LoginForm(ModalForm):
             if phone_number != self._settings.phone_number:
                 self._settings.phone_number = phone_number
                 self._settings.save()
-            self.ok()
+            return self.ok()
 
-        self._show_login_error(status)
+        if status is not LoginResult.Cancelled:
+            self._show_login_error(status)
 
     async def _do_login_process(self) -> LoginResult:
         """Adopted version of the code/logic extracted pyrogram.Client class."""
@@ -125,33 +123,33 @@ class LoginForm(ModalForm):
 
         try:
             if await client.connect():
-                phone_number = self._phone_number.get()
-                try:
-                    sent_code = await client.send_code(phone_number)
-                    waiter.destroy()
+                return LoginResult.Success
 
-                    confirm = PhoneCodeForm(self)
-                    if confirm.show_modal() is FormResult.Cancel:
-                        return LoginResult.CodeWrong
-                except BadRequest:
-                    return LoginResult.PhoneNumberInvalid
+            phone_number = self._phone_number.get()
+            try:
+                sent_code = await client.send_code(phone_number)
+                waiter.destroy()
 
+                confirm = PhoneCodeForm(self)
+                if confirm.show_modal() is FormResult.Cancel:
+                    return LoginResult.Cancelled
+            except BadRequest:
+                return LoginResult.PhoneNumberInvalid
+
+            try:
+                signed_in = await client.sign_in(phone_number, sent_code.phone_code_hash, confirm.phone_code)
+                return LoginResult.Success if isinstance(signed_in, User) else LoginResult.UserUnregistered
+            except BadRequest:
+                return LoginResult.CodeWrong
+            except SessionPasswordNeeded:
                 try:
-                    signed_in = await client.sign_in(phone_number, sent_code.phone_code_hash, confirm.phone_code)
-                    return LoginResult.Success if isinstance(signed_in, User) else LoginResult.UserUnregistered
+                    await client.check_password(self._password.get())
+                    return LoginResult.Success
                 except BadRequest:
-                    return LoginResult.CodeWrong
-                except SessionPasswordNeeded:
-                    try:
-                        await client.check_password(self._password.get())
-                        return LoginResult.Success
-                    except BadRequest:
-                        return LoginResult.PasswordIncorrect
+                    return LoginResult.PasswordIncorrect
         finally:
             await client.disconnect()
             waiter.destroy()
-
-        return LoginResult.Success
 
     @staticmethod
     def _show_login_error(error: LoginResult) -> None:
