@@ -141,8 +141,8 @@ class MainWindow(Toplevel):
             return True
 
         login_form = LoginForm(self, self._settings, self._loop)
-        status = login_form.show_modal()
-        return status is not FormResult.Ok
+        status = await login_form.async_show_modal()
+        return status is FormResult.Ok
 
     async def _fill_chats_box(self, chats: list[Chat]) -> None:
         allowed_chat_types = (ChatType.PRIVATE, ChatType.GROUP, ChatType.CHANNEL, ChatType.SUPERGROUP)
