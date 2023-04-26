@@ -17,14 +17,14 @@ def make_application_runner(title: str, *, asynchronous: bool = False) -> Runner
 
 def run_settings_editor() -> None:
     """Run settings form as the standalone application."""
-    app = make_application_runner("Telegram Explorer Settings")
+    app = make_application_runner("TE Settings")
     settings_window = SettingsForm(app, app.settings)
     app.start(settings_window)
 
 
 def run_session_creator() -> None:
     """Run login form as the standalone application."""
-    app = make_application_runner("Telegram Session Creator", asynchronous=True)
+    app = make_application_runner("TE Session Creator", asynchronous=True)
     login_form = LoginForm(app, app.settings, app.loop)
     app.start(login_form)
 
