@@ -103,7 +103,7 @@ class MainWindow(Toplevel):
 
     def _get_telegram_client(self) -> TelegramClient:
         return TelegramClient(
-            name="telegram-explorer",
+            name=self._settings.session_name,
             api_id=self._settings.api_id,
             api_hash=self._settings.api_hash,
             phone_number=self._settings.phone_number,

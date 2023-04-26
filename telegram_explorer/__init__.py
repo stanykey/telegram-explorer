@@ -23,15 +23,11 @@ def settings_file() -> Path:
 
 @dataclass(slots=True, kw_only=True)
 class Settings:
+    session_name: str
     api_id: int
     api_hash: str
     phone_number: str = ""
     path: Path = settings_file()
-
-    def __post_init__(self) -> None:
-        """We just want to do some minimal validation."""
-        if not self._validate_api():
-            raise ValueError("Settings initialized with wrong values")
 
     def get_session_dir(self) -> Path:
         """Return the settings parent directory, and ensure it exists."""
@@ -50,6 +46,7 @@ class Settings:
             raw_settings: dict[str, Any] = load(file)
 
         return cls(
+            session_name=raw_settings.get("session_name", "telegram-explorer"),
             path=path,
             api_id=int(raw_settings.get("api_id", 0)),
             api_hash=raw_settings.get("api_hash", ""),
@@ -62,9 +59,10 @@ class Settings:
         return cls.load(settings_file())
 
     def save(self) -> None:
+        """Save setting into the file at the `self.path`."""
         path = self.path if not self.path.exists() else self.path.with_suffix(".new")
 
-        data = dict(api_id=self.api_id, api_hash=self.api_hash)
+        data = dict(session_name=self.session_name, api_id=self.api_id, api_hash=self.api_hash)
         if self.phone_number:
             data["phone_number"] = self.phone_number
 
@@ -73,6 +71,3 @@ class Settings:
 
         if path is not self.path:
             path.replace(self.path)
-
-    def _validate_api(self) -> bool:
-        return bool(self.api_id) and bool(self.api_hash)

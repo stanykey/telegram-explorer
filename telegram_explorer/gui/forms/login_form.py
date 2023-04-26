@@ -116,7 +116,7 @@ class LoginForm(ModalForm):
         waiter = show_wait_window(self, message="Connecting to Telegram server...")
 
         client = Client(
-            name="telegram-explorer",
+            name=self._settings.session_name,
             api_id=self._settings.api_id,
             api_hash=self._settings.api_hash,
             phone_number=self._settings.phone_number,
