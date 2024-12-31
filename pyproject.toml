@@ -1,6 +1,56 @@
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "telegram-explorer"
+version = "0.10.0"
+description = "Tools to explore with Telegram"
+authors = ["Sergii Lovygin <sergey.lovygin@yahoo.com>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/stanykey/telegram-explorer"
+
+[tool.poetry.dependencies]
+python = "~=3.12"
+click = "8.1.8"
+pyrogram = "2.0.106"
+tgcrypto = "1.2.5"
+ttkthemes = "3.2.2"
+tkcalendar = "1.6.1"
+
+[tool.poetry.scripts]
+telegram-history = "telegram_explorer.cli.telegram_history:cli"
+tge-config-editor = "telegram_explorer.gui.applications:run_settings_editor"
+tge-session-creator = "telegram_explorer.gui.applications:run_session_creator"
+telegram-explorer = "telegram_explorer.gui.applications:run_telegram_explorer"
+
+[tool.ruff]
+fix = true
+line-length = 120
+indent-width = 4
+target-version = "py312"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+skip-magic-trailing-comma = true
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "B"]
+extend-select = ["I"]
+ignore = ["E501"]
+unfixable = ["B"]
+
+[tool.ruff.lint.isort]
+force-single-line = true
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402"]
+"**/{tests,docs,tools}/*" = ["E402"]
 
 [tool.mypy]
 show_error_codes = true
